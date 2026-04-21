@@ -18,7 +18,7 @@ const TestComponent = () => {
     <div>
       <div data-testid="auth-status">{isAuthenticated ? 'Authenticated' : 'Not Authenticated'}</div>
       <div data-testid="user-email">{user?.email}</div>
-      <button onClick={() => login('test@example.com', 'password')}>Login</button>
+      <button onClick={() => login({ email: 'test@example.com', password: 'password' })}>Login</button>
       <button onClick={logout}>Logout</button>
     </div>
   );
@@ -54,7 +54,7 @@ describe('AuthContext', () => {
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<div>Login Page</div>} />
-            <Route path="/home" element={<div>Home Page</div>} />
+            <Route path="/home" element={<TestComponent />} />
           </Routes>
         </AuthProvider>
       </MemoryRouter>

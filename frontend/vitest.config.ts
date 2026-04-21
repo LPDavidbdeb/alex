@@ -6,5 +6,16 @@ export default mergeConfig(viteConfig, defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    css: false,
+    server: {
+      deps: {
+        inline: [
+          /@csstools\/css-calc/,
+          /@asamuzakjp\/css-color/,
+          /tailwindcss/,
+          /postcss/
+        ]
+      }
+    }
   },
 }));

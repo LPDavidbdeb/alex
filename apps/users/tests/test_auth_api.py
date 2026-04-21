@@ -1,4 +1,5 @@
 import pytest
+import json
 from django.contrib.auth import get_user_model
 from django.test import Client
 
@@ -70,4 +71,40 @@ def test_get_me_with_valid_token(create_test_user):
     
     assert response.status_code == 200
     assert response.json()["email"] == "test_api@example.com"
+
+@pytest.mark.django_db
+def test_signup_with_valid_data():
+    """Teste la création d'un utilisateur avec des données valides."""
+    client = Client()
+    payload = {
+        "email": "newuser@example.com",
+        "password": "strongpassword123"
+    }
+    response = client.post(
+        "/api/auth/signup",
+        data=json.dumps(payload),
+        content_type="application/json"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "access" in data
+    assert "refresh" in data
+    assert data["email"] == "newuser@example.com"
+    assert User.objects.filter(email="newuser@example.com").exists()
+
+@pytest.mark.django_db
+def test_signup_with_existing_email(create_test_user):
+    """Teste qu'on ne peut pas s'inscrire avec un email déjà utilisé."""
+    client = Client()
+    payload = {
+        "email": "test_api@example.com",
+        "password": "somepassword"
+    }
+    response = client.post(
+        "/api/auth/signup",
+        data=json.dumps(payload),
+        content_type="application/json"
+    )
+    assert response.status_code == 400
+    assert "Un utilisateur avec cet email existe déjà" in response.json()["detail"]
 

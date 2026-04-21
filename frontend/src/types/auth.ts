@@ -1,7 +1,7 @@
 /**
  * Interface pour les informations de l'utilisateur.
  */
-export interface User {
+export type User = {
   email: string;
 }
 

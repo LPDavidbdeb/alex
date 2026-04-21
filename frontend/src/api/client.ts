@@ -3,10 +3,6 @@
  * Le proxy Vite redirige les appels de /api/ vers http://localhost:8000/api/.
  */
 
-interface RequestOptions extends RequestInit {
-  params?: Record<string, string>;
-}
-
 const BASE_URL = '/api';
 
 async function client(endpoint: string, { data, params, ...customConfig }: any = {}) {

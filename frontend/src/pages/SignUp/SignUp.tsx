@@ -8,28 +8,35 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Link } from 'react-router-dom';
 import logo from '@/assets/logo.png';
 
-const Login: React.FC = () => {
+const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const { login } = useAuth();
+  const { signup } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      setError('Les mots de passe ne correspondent pas');
+      return;
+    }
+
     setIsLoadingForm(true);
     setError(null);
 
     const credentials: LoginCredentials = { email, password };
 
     try {
-      await login(credentials);
+      await signup(credentials);
     } catch (err: any) {
-      if (err.status === 401) {
-        setError('Identifiants invalides');
+      if (err.status === 400) {
+        setError(err.data?.message || 'Un utilisateur avec cet email existe déjà');
       } else {
-        setError('Une erreur est survenue lors de la connexion');
+        setError('Une erreur est survenue lors de l\'inscription');
       }
     } finally {
       setIsLoadingForm(false);
@@ -39,6 +46,8 @@ const Login: React.FC = () => {
   const isEmailValid = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
+
+  const isFormValid = isEmailValid(email) && password.length >= 8 && password === confirmPassword;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
@@ -52,7 +61,7 @@ const Login: React.FC = () => {
               RM Logistique
             </CardTitle>
             <CardDescription>
-              Portail de gestion de transport
+              Création d'un compte partenaire
             </CardDescription>
           </div>
         </CardHeader>
@@ -75,8 +84,19 @@ const Login: React.FC = () => {
                 id="password"
                 type="password"
                 required
+                placeholder="Minimum 8 caractères"
                 value={password}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
               />
             </div>
             {error && (
@@ -89,14 +109,14 @@ const Login: React.FC = () => {
             <Button
               type="submit"
               className="w-full"
-              disabled={isLoadingForm || !isEmailValid(email)}
+              disabled={isLoadingForm || !isFormValid}
             >
-              {isLoadingForm ? 'Connexion en cours...' : 'Se connecter'}
+              {isLoadingForm ? 'Création en cours...' : 'S\'inscrire'}
             </Button>
             <div className="text-sm text-center text-muted-foreground">
-              Pas encore de compte ?{' '}
-              <Link to="/signup" className="text-primary hover:underline font-medium">
-                S'inscrire
+              Déjà un compte ?{' '}
+              <Link to="/login" className="text-primary hover:underline font-medium">
+                Se connecter
               </Link>
             </div>
           </CardFooter>
@@ -106,4 +126,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default SignUp;

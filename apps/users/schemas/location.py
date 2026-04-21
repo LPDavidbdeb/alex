@@ -1,5 +1,5 @@
 from ninja import Schema
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 class AddressSaveSchema(Schema):
     """Schéma pour la sauvegarde d'une adresse avec sa source (provider)."""
@@ -8,3 +8,17 @@ class AddressSaveSchema(Schema):
     latitude: float
     longitude: float
     data: Dict[str, Any]  # L'objet JSON brut provenant du provider
+
+class CoordinatesSchema(Schema):
+    lat: float
+    lng: float
+
+class RouteRequestSchema(Schema):
+    start: CoordinatesSchema
+    end: CoordinatesSchema
+
+class RouteResponseSchema(Schema):
+    distance_km: float
+    duration_min: float
+    geometry: List[List[float]] # GeoJSON [[lng, lat], ...]
+    provider: str

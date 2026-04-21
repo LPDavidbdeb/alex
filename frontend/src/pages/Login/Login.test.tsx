@@ -33,7 +33,7 @@ describe('Page de Connexion', () => {
 
   it('affiche un message d\'erreur en Français en cas d\'échec 401', async () => {
     // Mock d'une erreur 401
-    (apiClient.post as any).mockRejectedValueOnce({ status: 401, message: 'Non autorisé' });
+    vi.mocked(apiClient.post).mockRejectedValueOnce({ status: 401, message: 'Non autorisé' });
 
     renderLogin();
     
@@ -47,7 +47,7 @@ describe('Page de Connexion', () => {
   });
 
   it('affiche un état de chargement pendant l\'appel API', async () => {
-    (apiClient.post as any).mockReturnValue(new Promise(() => {})); // Promesse qui ne se résout jamais
+    vi.mocked(apiClient.post).mockReturnValue(new Promise(() => {})); // Promesse qui ne se résout jamais
 
     renderLogin();
     

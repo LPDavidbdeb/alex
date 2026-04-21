@@ -5,12 +5,17 @@
 
 const BASE_URL = '/api';
 
-async function client(endpoint: string, { data, params, ...customConfig }: any = {}) {
+export interface CustomConfig extends Omit<RequestInit, 'body'> {
+  data?: unknown;
+  params?: Record<string, string | number | boolean | undefined>;
+}
+
+async function client(endpoint: string, { data, params, ...customConfig }: CustomConfig = {}) {
   const token = localStorage.getItem('access_token');
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...customConfig.headers,
+    ...(customConfig.headers as Record<string, string>),
   };
 
   if (token) {
@@ -19,8 +24,16 @@ async function client(endpoint: string, { data, params, ...customConfig }: any =
 
   let url = `${BASE_URL}${endpoint}`;
   if (params) {
-    const searchParams = new URLSearchParams(params);
-    url += `?${searchParams.toString()}`;
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) {
+        searchParams.append(key, String(value));
+      }
+    });
+    const queryString = searchParams.toString();
+    if (queryString) {
+      url += `?${queryString}`;
+    }
   }
 
   const config: RequestInit = {
@@ -50,10 +63,10 @@ async function client(endpoint: string, { data, params, ...customConfig }: any =
 }
 
 export const apiClient = {
-  get: (endpoint: string, config: any = {}) => client(endpoint, { ...config, method: 'GET' }),
-  post: (endpoint: string, data: any, config: any = {}) => client(endpoint, { ...config, data, method: 'POST' }),
-  put: (endpoint: string, data: any, config: any = {}) => client(endpoint, { ...config, data, method: 'PUT' }),
-  delete: (endpoint: string, config: any = {}) => client(endpoint, { ...config, method: 'DELETE' }),
+  get: (endpoint: string, config: CustomConfig = {}) => client(endpoint, { ...config, method: 'GET' }),
+  post: (endpoint: string, data?: unknown, config: CustomConfig = {}) => client(endpoint, { ...config, data, method: 'POST' }),
+  put: (endpoint: string, data?: unknown, config: CustomConfig = {}) => client(endpoint, { ...config, data, method: 'PUT' }),
+  delete: (endpoint: string, config: CustomConfig = {}) => client(endpoint, { ...config, method: 'DELETE' }),
 };
 
 export default apiClient;

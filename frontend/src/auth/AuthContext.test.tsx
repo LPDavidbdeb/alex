@@ -32,7 +32,7 @@ describe('AuthContext', () => {
 
   it('restaure la session si un token est présent dans le localStorage', async () => {
     localStorage.setItem('access_token', 'fake-token');
-    (apiClient.get as any).mockResolvedValueOnce({ email: 'test@example.com' });
+    vi.mocked(apiClient.get).mockResolvedValueOnce({ email: 'test@example.com' });
 
     render(
       <MemoryRouter>

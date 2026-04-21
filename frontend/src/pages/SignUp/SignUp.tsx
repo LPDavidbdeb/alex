@@ -32,9 +32,10 @@ const SignUp: React.FC = () => {
 
     try {
       await signup(credentials);
-    } catch (err: any) {
-      if (err.status === 400) {
-        setError(err.data?.message || 'Un utilisateur avec cet email existe déjà');
+    } catch (err) {
+      const error = err as { status?: number; data?: { message?: string } };
+      if (error.status === 400) {
+        setError(error.data?.message || 'Un utilisateur avec cet email existe déjà');
       } else {
         setError('Une erreur est survenue lors de l\'inscription');
       }

@@ -3,15 +3,31 @@ import AsyncSelect from 'react-select/async';
 import type { MapProvider } from '../Map/MapWrapper';
 
 export interface AddressResult {
+  value: string;
   label: string;
   coords: { lat: number; lng: number };
-  raw: any; 
+  raw: unknown; 
   provider: MapProvider;
 }
 
 interface AddressAutocompleteProps {
   provider: MapProvider;
   onAddressSelect: (result: AddressResult) => void;
+}
+
+interface PhotonFeature {
+  geometry: {
+    coordinates: [number, number];
+  };
+  properties: {
+    name?: string;
+    house_number?: string;
+    street?: string;
+    city?: string;
+    postcode?: string;
+    state?: string;
+    countrycode?: string;
+  };
 }
 
 export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({ 
@@ -22,7 +38,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
   const loadOptions = (
     searchValue: string,
-    callback: (options: any[]) => void
+    callback: (options: AddressResult[]) => void
   ) => {
     if (!searchValue || searchValue.length < 3) {
         callback([]);
@@ -47,7 +63,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       fetch(url)
         .then(response => response.json())
         .then(data => {
-          const options = data.features.map((feature: any, index: number) => {
+          const options = data.features.map((feature: PhotonFeature) => {
             const { properties, geometry } = feature;
             
             // On privilégie les résultats canadiens
@@ -68,7 +84,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
             const label = Array.from(new Set(labelParts)).join(', ');
 
             return {
-              value: `osm-${index}-${geometry.coordinates[1]}`,
+              value: `osm-${geometry.coordinates[1]}`,
               label: label,
               coords: { 
                 lat: geometry.coordinates[1], 
@@ -102,7 +118,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         placeholder="Rechercher une adresse au Canada..."
         noOptionsMessage={() => "Aucun résultat"}
         loadingMessage={() => "Recherche..."}
-        onChange={(option: any) => {
+        onChange={(option: AddressResult | null) => {
             if (option) {
                 onAddressSelect(option);
                 setInputValue('');

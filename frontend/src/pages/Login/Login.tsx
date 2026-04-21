@@ -25,8 +25,9 @@ const Login: React.FC = () => {
 
     try {
       await login(credentials);
-    } catch (err: any) {
-      if (err.status === 401) {
+    } catch (err) {
+      const error = err as { status?: number };
+      if (error.status === 401) {
         setError('Identifiants invalides');
       } else {
         setError('Une erreur est survenue lors de la connexion');

@@ -39,4 +39,8 @@ frontend/dist/
 .DS_Store
 Thumbs.db
 
+# Credentials
+credentials/
+/google-credentials.json
+
 DEMARRAGE.md

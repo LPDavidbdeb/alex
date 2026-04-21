@@ -3,6 +3,7 @@ import { AuthProvider } from './auth/AuthContext';
 import Login from './pages/Login/Login';
 import SignUp from './pages/SignUp/SignUp';
 import Home from './pages/Home/Home';
+import AIConfig from './pages/AIConfig/AIConfig';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -17,6 +18,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/ai-config" 
+            element={
+              <ProtectedRoute>
+                <AIConfig />
               </ProtectedRoute>
             } 
           />

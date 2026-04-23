@@ -13,9 +13,10 @@ def create_test_user(db):
 def test_get_token_with_valid_credentials(create_test_user):
     """Vérifie qu'un token JWT est retourné avec des identifiants valides."""
     client = Client()
+    payload = {"email": "test_api@example.com", "password": "password123"}
     response = client.post(
         "/api/auth/token",
-        data={"email": "test_api@example.com", "password": "password123"},
+        data=json.dumps(payload),
         content_type="application/json"
     )
     
@@ -23,6 +24,8 @@ def test_get_token_with_valid_credentials(create_test_user):
     data = response.json()
     assert "access" in data
     assert "refresh" in data
+    assert "email" in data
+    assert data["email"] == "test_api@example.com"
 
 @pytest.mark.django_db
 def test_get_token_with_invalid_credentials():
@@ -107,4 +110,21 @@ def test_signup_with_existing_email(create_test_user):
     )
     assert response.status_code == 400
     assert "Un utilisateur avec cet email existe déjà" in response.json()["detail"]
+
+@pytest.mark.django_db
+def test_user_schema_resolvers():
+    """Vérifie que le schéma résout bien les noms d'unité et de bannière."""
+    from apps.companies.models import Company
+    from apps.addresses.models import Address
+    from apps.users.schemas.auth import UserSchema
+    
+    banner = Company.objects.create(name="Banner")
+    addr = Address.objects.create(label="Unit Addr", latitude=0, longitude=0, source="X", raw_json={})
+    unit = Company.objects.create(name="Unit", parent=banner, default_address=addr)
+    user = User.objects.create(email="res@test.com", company=unit)
+    
+    schema_data = UserSchema.from_orm(user)
+    assert schema_data.unit_name == "Unit"
+    assert schema_data.banner_name == "Banner"
+    assert schema_data.unit_address.label == "Unit Addr"
 

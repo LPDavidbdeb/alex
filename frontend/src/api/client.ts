@@ -66,6 +66,7 @@ export const apiClient = {
   get: (endpoint: string, config: CustomConfig = {}) => client(endpoint, { ...config, method: 'GET' }),
   post: (endpoint: string, data?: unknown, config: CustomConfig = {}) => client(endpoint, { ...config, data, method: 'POST' }),
   put: (endpoint: string, data?: unknown, config: CustomConfig = {}) => client(endpoint, { ...config, data, method: 'PUT' }),
+  patch: (endpoint: string, data?: unknown, config: CustomConfig = {}) => client(endpoint, { ...config, data, method: 'PATCH' }),
   delete: (endpoint: string, config: CustomConfig = {}) => client(endpoint, { ...config, method: 'DELETE' }),
 };
 

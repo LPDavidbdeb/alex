@@ -14,7 +14,7 @@ class OSRMProvider(RoutingProvider):
         self.base_url = "http://router.project-osrm.org/route/v1/driving/"
 
     def calculate_route(self, start_coords: Dict[str, float], end_coords: Dict[str, float]) -> Optional[Dict[str, Any]]:
-        # Format OSRM: {lng},{lat};{lng},{lat}
+        # Format OSRM: longitude,latitude
         url = f"{self.base_url}{start_coords['lng']},{start_coords['lat']};{end_coords['lng']},{end_coords['lat']}"
         params = {
             "overview": "full",
@@ -50,7 +50,6 @@ class GoogleRoutingProvider(RoutingProvider):
 
     def calculate_route(self, start_coords: Dict[str, float], end_coords: Dict[str, float]) -> Optional[Dict[str, Any]]:
         try:
-            # Note: Google prend (lat, lng) contrairement à OSRM
             result = self.client.directions(
                 (start_coords['lat'], start_coords['lng']),
                 (end_coords['lat'], end_coords['lng']),
@@ -59,11 +58,10 @@ class GoogleRoutingProvider(RoutingProvider):
             if not result: return None
             
             leg = result[0]['legs'][0]
-            # Ici on devrait normalement décoder la polyline de Google pour avoir le même format que OSRM
             return {
                 "distance_km": round(leg['distance']['value'] / 1000, 2),
                 "duration_min": round(leg['duration']['value'] / 60, 1),
-                "geometry": [], # À implémenter avec polyline.decode si nécessaire
+                "geometry": [],
                 "provider": "google"
             }
         except Exception as e:

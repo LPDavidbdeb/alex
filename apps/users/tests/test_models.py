@@ -45,3 +45,9 @@ def test_create_superuser_successful():
     assert admin_user.is_active is True
     assert admin_user.is_staff is True
     assert admin_user.is_superuser is True
+
+@pytest.mark.django_db
+def test_user_str():
+    """Vérifie la représentation string de l'utilisateur."""
+    user = User(email="str@test.com")
+    assert str(user) == "str@test.com"

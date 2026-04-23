@@ -56,6 +56,6 @@ describe('Page de Connexion', () => {
     fireEvent.click(screen.getByRole('button', { name: /Se connecter/i }));
 
     expect(screen.getByText(/Connexion en cours/i)).toBeInTheDocument();
-    expect(screen.getByRole('button')).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Connexion en cours/i })).toBeDisabled();
   });
 });

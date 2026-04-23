@@ -17,10 +17,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
           const userData = await apiClient.get('/auth/me') as User;
           setUser(userData);
-        } catch (error) {
-          console.error('Erreur de restauration de session', error);
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
+        } catch (error: unknown) {
+          const err = error as { status?: number };
+          if (err.status === 401) {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+          } else {
+            console.error('Erreur de restauration de session', error);
+          }
         }
       }
       setIsLoading(false);

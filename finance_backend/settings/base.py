@@ -32,6 +32,12 @@ INSTALLED_APPS = [
     
     # Apps
     'apps.users',
+    'apps.addresses',
+    'apps.quotes',
+    'apps.logistics',
+    'apps.products',
+    'apps.analytics',
+    'apps.companies',
 ]
 
 SITE_ID = 1

@@ -9,18 +9,20 @@ import {
   Brain, 
   ArrowUpRight, 
   ArrowDownLeft,
-  ChevronRight,
   Info
 } from 'lucide-react';
 import { Button } from './ui/Button';
+import { useAuth } from '@/auth/useAuth';
 
 export const GoogleAIStatus: React.FC = () => {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [status, setStatus] = useState<GoogleStatus | null>(null);
   const [metrics, setMetrics] = useState<UsageMetrics | null>(null);
   const [loading, setLoading] = useState(false);
   const [showAllModels, setShowAllModels] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    if (!isAuthenticated) return;
     setLoading(true);
     try {
       const [statusRes, metricsRes] = await Promise.all([
@@ -29,20 +31,23 @@ export const GoogleAIStatus: React.FC = () => {
       ]);
       setStatus(statusRes);
       setMetrics(metricsRes);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erreur lors de la récupération des infos Google AI:", error);
+      const err = error as { message?: string };
       setStatus({
         status: 'error',
-        message: error.message || "Erreur de communication avec le serveur."
+        message: err.message || "Erreur de communication avec le serveur."
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isAuthenticated && !authLoading) {
+      fetchData();
+    }
+  }, [isAuthenticated, authLoading, fetchData]);
 
   const formatTokens = (num: number) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -63,13 +68,16 @@ export const GoogleAIStatus: React.FC = () => {
           variant="ghost" 
           size="sm" 
           onClick={fetchData} 
-          disabled={loading}
+          disabled={loading || !isAuthenticated}
           className="h-8 w-8 p-0 hover:bg-white"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
         </Button>
       </CardHeader>
       <CardContent className="pt-6">
+        {!isAuthenticated ? (
+            <div className="text-center py-4 text-slate-500 text-xs">Authentification requise...</div>
+        ) : (
         <div className="space-y-6">
           {/* Status Section */}
           <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100">
@@ -164,6 +172,7 @@ export const GoogleAIStatus: React.FC = () => {
             )}
           </div>
         </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/Label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Link } from 'react-router-dom';
 import logo from '@/assets/logo.png';
+import { Navbar } from '@/components/Navbar';
 
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -51,8 +52,10 @@ const SignUp: React.FC = () => {
   const isFormValid = isEmailValid(email) && password.length >= 8 && password === confirmPassword;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-slate-50">
+      <Navbar />
+      <div className="flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-md">
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">
             <img src={logo} alt="RM Logistic Logo" className="h-16 w-auto" />
@@ -123,6 +126,7 @@ const SignUp: React.FC = () => {
           </CardFooter>
         </form>
       </Card>
+      </div>
     </div>
   );
 };
